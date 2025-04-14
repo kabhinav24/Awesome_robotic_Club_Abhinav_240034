@@ -33,7 +33,99 @@ partB-Now, let’s assume you’ve chosen a mechanism to detect the movement of 
       Given that there are 64 squares on a chessboard, but our poor Arduino has only about 20 I/O pins, 
       how would you detect exactly which square has been activated using the minimum number of pins?
       Present your answer in the form of a detailed explanation of the solution with diagrams wherever necessary.
--- i dont have some much idea how to do that.
+-- To detect which square has been activated on a chessboard using a limited number of I/O pins, we can implement a matrix scanning technique. 
+   This method allows us to efficiently monitor the state of multiple switches (or sensors) using fewer pins than there are switches.
+
+   Matrix Scanning Technique
+   Matrix Layout:
+
+The chessboard consists of 64 squares, which can be arranged in an 8x8 matrix (8 rows and 8 columns).
+Each square corresponds to a unique combination of a row and a column.
+Pin Configuration:
+
+We will use 8 pins for the rows and 8 pins for the columns.
+This results in a total of 16 pins, which is manageable within the constraints of an Arduino with around 20 I/O pins.
+Wiring:
+
+Connect each row pin to the switches in that row.
+Connect each column pin to the switches in that column.
+Each switch will connect the corresponding row and column pins.
+Scanning Process
+Initialization:
+
+Set all row pins to LOW and all column pins to HIGH.
+Row Activation:
+
+For each row, set the row pin to HIGH one at a time while keeping the other row pins LOW.
+This will activate the row and allow us to check which column has a LOW signal.
+Column Reading:
+
+After setting a row pin HIGH, read the state of all column pins.
+If a column pin reads LOW, it indicates that a piece has been lifted from the square at the intersection of the active row and that column.
+Repeat:
+
+Repeat the process for all rows to check for any activated squares.
+Example of Scanning Logic
+Set R1 HIGH (Row 1):
+
+Set R1 to HIGH, R2 to R8 LOW.
+Read C1 to C8:
+If C3 is LOW, it means a piece was lifted from square (R1, C3).
+Set R2 HIGH (Row 2):
+
+Set R2 to HIGH, R1 and R3 to R8 LOW.
+Read C1 to C8:
+If C5 is LOW, it means a piece was lifted from square (R2, C5).
+Continue for All Rows:
+
+Repeat this process for R3 to R8.
+
+
+Here is the python code for this--
+import time
+import RPi.GPIO as GPIO  # Use appropriate library for your hardware
+
+# Define the GPIO pins for rows and columns
+ROW_PINS = [2, 3, 4, 5, 6, 7, 8, 9]  # Example GPIO pins for rows
+COLUMN_PINS = [10, 11, 12, 13, 14, 15, 16, 17]  # Example GPIO pins for columns
+
+# Setup GPIO
+GPIO.setmode(GPIO.BCM)  # Use BCM pin numbering
+for pin in ROW_PINS:
+    GPIO.setup(pin, GPIO.OUT)
+for pin in COLUMN_PINS:
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Set columns as input with pull-up
+
+def scan_chessboard():
+    activated_squares = []  # List to store activated squares
+    for row_index, row_pin in enumerate(ROW_PINS):
+        # Set the current row HIGH and others LOW
+        GPIO.output(row_pin, GPIO.HIGH)
+        time.sleep(0.01)  # Short delay to stabilize the signal
+        
+        for col_index, col_pin in enumerate(COLUMN_PINS):
+            if GPIO.input(col_pin) == GPIO.LOW:  # Check if the column pin is LOW
+                # A piece has been lifted from the square (row_index, col_index)
+                activated_squares.append((row_index + 1, col_index + 1))  # Store as (row, column)
+        
+        # Set the current row back to LOW
+        GPIO.output(row_pin, GPIO.LOW)
+
+    return activated_squares
+
+try:
+    while True:
+        activated = scan_chessboard()
+        if activated:
+            for square in activated:
+                print(f"Piece lifted from: Row {square[0]}, Column {square[1]}")
+        time.sleep(1)  # Delay before the next scan
+
+except KeyboardInterrupt:
+    print("Exiting...")
+finally:
+    GPIO.cleanup()  # Clean up GPIO settings
+
 
 
 
