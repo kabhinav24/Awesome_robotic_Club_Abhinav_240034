@@ -1,0 +1,48 @@
+PART-A: Initially, we will need to figure out a reliable and efficient way to detect which chess piece moves from which square to which.
+        We’re specifically looking for solutions that don’t involve computer vision, RFID, or magnetic sensors.
+        Present your solution in the form of a detailed explanation of the mechanism with diagrams.  
+--One of the method to do this task done is using pressure sensor grid mechanism beneath each square of the board.
+  We build a grid of pressure sensors under each square of the chessboard.Each square has its own sensor that detects whether a 
+  piece is placed on it (weight present) or removed (weight lifted) and all the chess piece have different weight so we can determine which 
+  piece is present where.
+  Scanning the pressure status before and after each move, we can determine the source and destination move after each turn
+  we have assign the some pressure value to each square in chessboard to determine the how moves are made.
+  first we assign(any) value to square where chesspiece are present initially to rreport pressure level then after when piece is moved from any
+  assigned square its chnage can be recorded and we can decide from where it is moved and then finnally the pressure of the square where it is
+  going to be placed is also change.in this way we can determine from which box to which box piece is moving using pressure sensor grid 
+  addition to this we decide which piece is moving by the weigthof the piece which we use since all soldier piece are of same weight but
+  other piece have diffrent values.
+  Each sensor is part of a row and column connection.The microcontroller scans all sensors rapidly and compares pressure values.
+  micocontroller used can be arduino which can store move history and other information about the move then display it onthe computer.
+
+  p00 p01 p02 p03 p04 p05 p06 p07 
+  ...
+  ... 
+  ...
+  ...
+  ...
+  ...
+  p70 .....                   p77
+
+  each box detect different pressure value which is determine by the piece placed on the squrrebox and is detected by the sensors.
+
+  Each sensor is normally open (no signal).
+
+partB-Now, let’s assume you’ve chosen a mechanism to detect the movement of the pieces. To simplify the problem, 
+      suppose this mechanism works such that each square outputs a signal of 1 when a piece is lifted from it—let’s define this event as an “activation.”
+      Given that there are 64 squares on a chessboard, but our poor Arduino has only about 20 I/O pins, 
+      how would you detect exactly which square has been activated using the minimum number of pins?
+      Present your answer in the form of a detailed explanation of the solution with diagrams wherever necessary.
+-- i dont have some much idea how to do that.
+
+
+
+
+
+
+
+
+
+
+
+
